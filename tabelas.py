@@ -12,16 +12,18 @@ class Individuo(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     nome: Mapped[str] = mapped_column(String)
     sobrenome: Mapped[str] = mapped_column(String)
+    genero: Mapped[Optional[str]] = mapped_column(String) # m (masculino), f (feminino), x (outro), None (desconhecido)
 
     parentesco_id: Mapped[Optional[int]] = mapped_column(ForeignKey("familias.id"))
     parentesco: Mapped[Optional["Familia"]] = relationship(back_populates="crianças")
+
+    eventos: Mapped[Optional[list["Evento"]]] = relationship(back_populates="indi")
 
     def nome_sobrenome(self):
         return f"{self.nome} {self.sobrenome}"
         
     def __repr__(self):
         return f"([{self.id}] {self.nome} {self.sobrenome})"
-
 
     
 class Familia(Base):
@@ -42,6 +44,7 @@ class Casamento(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     data: Mapped[Optional[date]] = mapped_column()
     local: Mapped[Optional[str]] = mapped_column()
+    notas: Mapped[Optional[str]] = mapped_column()
 
     conjuge_a_id: Mapped[int] = mapped_column(ForeignKey("individuos.id"))
     conjuge_a: Mapped["Individuo"] = relationship(foreign_keys=conjuge_a_id,
@@ -54,4 +57,14 @@ class Casamento(Base):
 
     def __repr__(self):
         return f"Casamento[{self.id}] ({self.conjuge_a_id}+{self.conjuge_b_id})"
-    
+
+class Evento(Base):
+    __tablename__ = "eventos"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tipo: Mapped[str] = mapped_column()
+    data: Mapped[Optional[date]] = mapped_column()
+    local: Mapped[Optional[str]] = mapped_column()
+    notas: Mapped[Optional[str]] = mapped_column()
+
+    indi_id: Mapped[int] = mapped_column(ForeignKey("individuos.id"))
+    indi: Mapped["Individuo"] = relationship(back_populates="eventos")
