@@ -1,9 +1,9 @@
 #exemplo simples/sujo de uso de db.py
+from app.db import DBManager
 
-from db import DBManager
 database = DBManager("sqlite:///database.db")
 def main_menu():
-    while(True):
+    while True:
         print("\nMENU PRINCIPAL")
         print("I - Adicionar indivíduo")
         print("B - Buscar indivíduo")
@@ -185,9 +185,6 @@ def parentesco():
         cas = cas[0]
 
     database.add_criança(criança, cas)
-
-
-
 
 main_menu()
 
