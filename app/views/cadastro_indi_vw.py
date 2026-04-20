@@ -1,5 +1,5 @@
 # app/views/cadastro_view.py
-from PySide6.QtCore import QRegularExpression
+from PySide6.QtCore import QRegularExpression, QDate
 from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtWidgets import (
     QWidget, 
@@ -8,10 +8,13 @@ from PySide6.QtWidgets import (
     QLabel,
     QFormLayout, 
     QLineEdit, 
-    QComboBox, 
+    QComboBox,
+    QCheckBox,
     QPushButton, 
     QMessageBox
 )
+
+from app.models.enums import GenderEnum
 
 class CadastroIndiVw(QWidget):
     def __init__(self, controller):
@@ -38,8 +41,22 @@ class CadastroIndiVw(QWidget):
         self.input_lname.setPlaceholderText("Digite seu sobrenome")
         self.input_lname.setValidator(validador_letras)
         
+        # form.addRow("Nome*:", self.input_fname)
+        # form.addRow("Sobrenome*:", self.input_lname)
+        
+        # para genero=combobox + Enum
+        self.combo_box_genero=QComboBox()
+        for genero in GenderEnum:
+            # add item (txt visivel, objeto pyhton)
+            self.combo_box_genero.addItem(genero.value, genero)
+            
+        self.chk_vivo=QCheckBox("A pessoa está viva")
+        self.chk_vivo.setChecked(True)
+        
         form.addRow("Nome*:", self.input_fname)
         form.addRow("Sobrenome*:", self.input_lname)
+        form.addRow("Gênero:", self.combo_box_genero)
+        form.addRow("", self.chk_vivo)
         
         save_btn=QPushButton("Adicionar pessoa")
         save_btn.clicked.connect(self.salvar_dados)
@@ -48,11 +65,22 @@ class CadastroIndiVw(QWidget):
         layoutv.addWidget(save_btn)
     
     def salvar_dados(self):
-        # prepara um dicionario simples com os dados da tela
+        # coleta os dados do form da tela
+        # envia para o Controller em formato de dicionario
+        
+        # Pega o objeto GeneroEnum "invisível" anexado à seleção atual
+        gen_select = self.combo_box_genero.currentData()
+        
         dados = {
             "nome": self.input_fname.text(),
-            "sobrenome": self.input_lname.text()
+            "sobrenome": self.input_lname.text(),
+            "genero": gen_select,
+            "vivo": self.chk_vivo.isChecked()   
         }
+        
+        if not dados["nome"] or not dados["sobrenome"] or not dados:
+            QMessageBox.warning(self, "Aviso", "Preencha todos os campos obrigatorios marcados com *")
+            return
         
         # if not dados["nome"] or not dados["sobrenome"] or not dados:
         #     QMessageBox.warning(self, "Aviso", "Preencha todos os campos obrigatórios, marcados com (*)")
@@ -71,6 +99,7 @@ class CadastroIndiVw(QWidget):
     def limpar_campos(self):
         self.input_fname.clear()
         self.input_lname.clear()
+        
             
             
 

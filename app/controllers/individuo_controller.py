@@ -5,17 +5,23 @@ from sqlalchemy.exc import SQLAlchemyError
 # validacao com pydantic
 from pydantic import BaseModel, Field, field_validator, ValidationError
 # tabelas.py -> models
-from app.models.tabelas import Individuo
+
+from app.models.individuo import Individuo
+from app.models.enums import GenderEnum
 
 from datetime import date
 import re
 # db -> controller
 # main -> GUI.py
 class IndividuoSchema(BaseModel):
+    nome: str=Field(..., min_length=2, max_length=50, description="Primeiro nome da pessoa")
+    sobrenome: str=Field(..., min_length=2, max_length=50, description="Sobrenome da pessoa")
     
-    nome: str=Field(..., min_length=2, max_length=100, description="Primeiro nome da pessoa")
-    sobrenome: str=Field(..., min_length=2, max_length=100, description="Sobrenome da pessoa")
-    # genero
+    # validacao suja, nao sei como validar isso, mas tbm nao acho necessario
+    genero: GenderEnum
+    vivo: bool=True
+    # genero M F N outro
+    
     # data_nasc: date | None = None
     # local_nasc: str | None = Field(default=None, max_length=100)
     # notas: str | None = Field(default=None, max_length=100)
@@ -28,7 +34,6 @@ class IndividuoSchema(BaseModel):
             raise ValueError("Nome deve conter apenas letras")
         return valor.strip()
 
-
 class IndividuoController:
     def __init__(self, session_maker: sessionmaker):
         # injeta a fabrica de sessoes do sqlalchemy
@@ -40,7 +45,7 @@ class IndividuoController:
         # recebe um dicionario
         try:
             # valida com o esquema do pydantic
-            dados_validados=IndividuoSchema(**dados_entrada)
+            dados_validados=IndividuoSchema(**dados_entrada) # ** serve para desencapsular dicionario
         except ValidationError as e:
             # erro capturado pelo pydantic
             raise ValueError(f"Erro de Validação:\n{e.errors()[0]['msg']}")
@@ -50,7 +55,9 @@ class IndividuoController:
             try:
                 novo_indi=Individuo(
                     nome=dados_validados.nome,
-                    sobrenome=dados_validados.sobrenome
+                    sobrenome=dados_validados.sobrenome,
+                    genero=dados_validados.genero,
+                    vivo=dados_validados.vivo
                 )
                 session.add(novo_indi)
                 session.commit()
