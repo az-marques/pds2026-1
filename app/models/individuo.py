@@ -1,6 +1,3 @@
-# from sqlalchemy import String, ForeignKey, select, Enum as SQLEnum
-# from sqlalchemy.orm import Mapped, mapped_column, relationship
-# from sqlalchemy.sql.expression import or_
 # APAGUE ESTAS LINHAS:
 # from .evento import Evento
 # from .familia import Familia
@@ -21,7 +18,7 @@ class Individuo(Base):
     genero: Mapped[GenderEnum] = mapped_column(
         SQLEnum(GenderEnum), 
         nullable=False,
-        default=GenderEnum.OTHER) # opcicional = native_enum=False
+        default=GenderEnum.OTHER) # opcional = native_enum=False
     # boolean vivo True or False
     vivo: Mapped[bool] = mapped_column(default=True)
     
@@ -29,10 +26,10 @@ class Individuo(Base):
     parentesco: Mapped[Optional["Familia"]] = relationship(back_populates="crianças")
 
     eventos: Mapped[Optional[list["Evento"]]] = relationship(back_populates="indi")
-    # def nome_sobrenome(self):
-    #     return f"{self.nome} {self.sobrenome}"
-    # def __repr__(self):
-    #     return f"([{self.id}] {self.nome} {self.sobrenome})"
+    
+    def nome_sobrenome(self):
+         return f"{self.nome} {self.sobrenome}"
+    
     def __repr__(self) -> str:
         status = "Vivo" if self.vivo else "Falecido"
         return f"([{self.id}] {self.nome} {self.sobrenome} - {self.genero} - {status})"

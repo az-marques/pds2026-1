@@ -22,3 +22,14 @@ class Evento(Base):
 
     indi_id: Mapped[int] = mapped_column(ForeignKey("individuos.id"))
     indi: Mapped["Individuo"] = relationship(back_populates="eventos")
+    
+    def get_ev_indi(self) -> tuple:
+        
+        fullname=self.indi.nome_sobrenome() if self.indi else "Indi desconhecido"
+        
+        return (
+            self.self.tag.value,
+            self.data,
+            self.local,
+            fullname
+        )
