@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout, 
     QHBoxLayout,
     QLabel,
+    QDateEdit,
     QFormLayout, 
     QLineEdit, 
     QComboBox,
@@ -15,20 +16,17 @@ from PySide6.QtWidgets import (
 )
 
 from app.models.enums import GenderEnum
-
 class CadastroIndiVw(QWidget):
     def __init__(self, controller):
         super().__init__()
-        self.controller=controller
-        
+        self.controller = controller
         self.setWindowTitle("Dados cadastrais do indivíduo")
         self.setMinimumSize(700, 500)
-        
         self.form_setup()
         
     def form_setup(self):
-        layoutv=QVBoxLayout(self)
-        form=QFormLayout()
+        layoutv = QVBoxLayout(self)
+        form = QFormLayout()
         # self.txt=QLabel("Digite os dados de cadastro do individuo")
         # Validador Front-end: Bloqueia números e caracteres especiais
         validador_letras = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-zÀ-ÿ\s]+$"))
@@ -43,7 +41,6 @@ class CadastroIndiVw(QWidget):
         
         # form.addRow("Nome*:", self.input_fname)
         # form.addRow("Sobrenome*:", self.input_lname)
-        
         # para genero=combobox + Enum
         self.combo_box_genero=QComboBox()
         for genero in GenderEnum:
@@ -53,10 +50,26 @@ class CadastroIndiVw(QWidget):
         self.chk_vivo=QCheckBox("A pessoa está viva")
         self.chk_vivo.setChecked(True)
         
+        self.birth_dt_input = QDateEdit()
+        self.birth_dt_input.setCalendarPopup(True)
+        
+        self.birth_place_input=QLineEdit()
+        self.birth_place_input.setPlaceholderText("Local, cidade ou região natal")
+        # self.birth_place_input.setValidator(validador_letras)
+        
+        self.birth_notes_input=QLineEdit()
+        self.birth_notes_input.setPlaceholderText("Notas")
+        
         form.addRow("Nome*:", self.input_fname)
         form.addRow("Sobrenome*:", self.input_lname)
         form.addRow("Gênero:", self.combo_box_genero)
+        
+        form.addRow("", self.birth_dt_input)
+
+        form.addRow("Local:", self.birth_place_input)
+        form.addRow("Notas:", self.birth_notes_input)
         form.addRow("", self.chk_vivo)
+        
         
         save_btn=QPushButton("Adicionar pessoa")
         save_btn.clicked.connect(self.salvar_dados)
@@ -64,18 +77,21 @@ class CadastroIndiVw(QWidget):
         layoutv.addLayout(form)
         layoutv.addWidget(save_btn)
     
-    def salvar_dados(self):
-        # coleta os dados do form da tela
-        # envia para o Controller em formato de dicionario
-        
+    def salvar_dados(self):        
         # Pega o objeto GeneroEnum "invisível" anexado à seleção atual
         gen_select = self.combo_box_genero.currentData()
-        
+        # coleta os dados do form da tela
+        # envia para o Controller em formato de dicionario
         dados = {
             "nome": self.input_fname.text(),
             "sobrenome": self.input_lname.text(),
             "genero": gen_select,
-            "vivo": self.chk_vivo.isChecked()   
+            "vivo": self.chk_vivo.isChecked(),
+            "nascimento": {
+                "data": self.birth_dt_input.date().toPython(),
+                "local": self.birth_place_input.text(),
+                "notas": self.birth_notes_input.text()
+            }
         }
         
         if not dados["nome"] or not dados["sobrenome"] or not dados:
@@ -101,8 +117,6 @@ class CadastroIndiVw(QWidget):
         self.input_lname.clear()
         
             
-            
-
 # # Trecho dentro de app/views/cadastro_view.py, no método ao_salvar:
 
 # def ao_salvar(self):
