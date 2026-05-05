@@ -18,6 +18,7 @@ import re
 # main -> GUI.py
 
 class EventSchema(BaseModel):
+    tag: EvenTagEnum
     data: date
     local: str=Field(..., min_length=2, max_length=100, description="Local do evento")
     notas: Optional[str] = None # nao precisa de uma mascara?
@@ -97,7 +98,7 @@ class IndividuoController:
                 raise Exception(f"Erro na base de dados: {str(err_db)}")
 
     #retorna um dicionário com os dados do indivíduo
-    def acessa_individuo(self, indi_id: int):
+    def acessa_individuo(self, indi_id: int) -> dict:
         with self.Session() as session:
             try:
                 stmt = select(Individuo).where(Individuo.id == indi_id)
