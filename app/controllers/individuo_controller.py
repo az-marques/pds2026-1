@@ -1,6 +1,7 @@
 # importacoes de controle de individuo
 # sqlalchemy orm
 from typing import Optional
+from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 # validacao com pydantic
@@ -94,3 +95,24 @@ class IndividuoController:
             except SQLAlchemyError as err_db:
                 session.rollback()
                 raise Exception(f"Erro na base de dados: {str(err_db)}")
+
+    #retorna um dicionário com os dados do indivíduo
+    def acessa_individuo(self, indi_id: int):
+        with self.Session() as session:
+            try:
+                stmt = select(Individuo).where(Individuo.id == indi_id)
+                resultado = session.scalars(stmt).one()
+
+                dados = {
+                    "id": resultado.id,
+                    "nome": resultado.nome,
+                    "sobrenome": resultado.nome,
+                    "genero": resultado.genero,
+                    "parentesco_id": resultado.parentesco.id
+                }
+                return dados
+            except SQLAlchemyError as err_db:
+                session.rollback()
+                raise Exception(f"Erro na base de dados: {str(err_db)}")
+    
+
