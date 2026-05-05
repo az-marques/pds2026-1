@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import date
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import or_
@@ -10,12 +11,23 @@ class DBManager():
         Base.metadata.create_all(self.engine)
         
     #cria um objeto Individuo, o adiciona a database, e o retorna
-    def add_individuo(self, indi__nome: str, indi_sobrenome: str):
+    def add_individuo(self, indi__nome: str, indi_sobrenome: str, indi_genero: Optional[str] = None):
+        match indi_genero.lower():
+            case "f" | "feminino" | "mulher":
+                indi_genero="f"
+            case "m" | "masculino" | "homem":
+                indi_genero="m"
+            case "x" | "não-binárie" | "não-binário" | "não-binária" | "outro":
+                indi_genero="x" #provalvemente não vai ser relevante nessa database mais não custa nada suportar
+            case None | "não conhecido" | "desconhecido": 
+                indi_genero = None
+            case _:
+                print("Gênero não reconhecido, tente \"f\", \"m\", \"x\", ou None")
+                return None
+        
         with Session(self.engine) as session:
-            indi = Individuo(nome=indi__nome, sobrenome=indi_sobrenome)
+            indi = Individuo(nome=indi__nome, sobrenome=indi_sobrenome, genero=indi_genero)
             session.add(indi)
-            #if (parentesco != None):
-            #    parentesco.crianças.append(indi)
             session.commit()
         return indi
     
@@ -35,11 +47,37 @@ class DBManager():
             individuos = session.scalars(stmt).all()
         return individuos
     
-    def add_casamento (self, conjuge_a: Individuo, conjuge_b: Individuo):
+    #adiciona um evento de tip dado para o indivíduo dado, opionalmente na data dada no local dado]
+    #tipos nascimento, batismo, óbito, e chegada (use notas para registrar o navio)
+    def add_evento(self, indi: Individuo, tipo: str,
+                   data: Optional[date] = None, local: Optional[str] = None, notas: Optional[str] = None):
+        match tipo.lower():
+            case "nascimento":
+                tipo="nascimento"
+            case "batismo":
+                tipo="batismo"
+            case "óbito" | "obito":
+                tipo="obito"
+            case "chegada" | "imigração" | "imigracao":
+                tipo="chegada"
+            case _:
+                print("Tipo de evento não reconhecido.")
+                return None
+
+        with Session(self.engine) as session:
+            eve = Evento(tipo=tipo, data=data, local=local, notas=notas)
+            indi.eventos.append(eve)
+            session.commit()
+        return eve
+    
+    #registra dois indivíduos como casados. Opcionalmente, na data dada e no local dado.
+    def add_casamento (self, conjuge_a: Individuo, conjuge_b: Individuo,
+                       data: Optional[date] = None, local: Optional[str] = None, notas: Optional[str] = None):
         with Session(self.engine) as session:
             conjuge_a = session.merge(conjuge_a)
             conjuge_b = session.merge(conjuge_b)
-            cas = Casamento(conjuge_a=conjuge_a, conjuge_b=conjuge_b)
+            cas = Casamento(conjuge_a=conjuge_a, conjuge_b=conjuge_b,
+                            data=data, local=local, notas=notas)
             session.add(cas)
             session.commit()
         return cas
@@ -56,8 +94,9 @@ class DBManager():
     def get_familia(self, pais: Casamento):
         with Session(self.engine) as session:
             pais = session.merge(pais)
-            stmt = select(Familia).where(Familia.pais == pais) #...provalvemente posso so fazer pais.familia
-            fam = session.scalars(stmt).first()
+            #stmt = select(Familia).where(Familia.pais == pais) #...provalvemente posso so fazer pais.familia
+            #fam = session.scalars(stmt).first()
+            fam = pais.familia
         return fam
     
     #dado pais ou uma familia, adiciona um indivíduo dado como criança dessa família
@@ -86,6 +125,7 @@ class DBManager():
                 return familia.crianças
         return[]
 
+    #adiciona um exemplo de família pra database
     def carregar_exemplo(self):
         homer = self.add_individuo("Homer", "Simpson")
         marge = self.add_individuo("Marge", "Simpson")
