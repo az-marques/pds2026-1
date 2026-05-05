@@ -17,9 +17,7 @@ def consulta_pessoa():
     # Itera sobre os resultados e imprime no terminal
     for i in individuos:
         # Você pode formatar a saída como preferir
-        # print(i)
-        print(f"<[{i.id}] Nome: {i.nome} {i.sobrenome}, {i.genero}, {i.vivo}>")
-        #print(f"ID: {i.id} | Nome: {i.nome} | Gen: {i.genero0} | Vivo? {i.vivo} | ")
+        print(f"<[{i.id}] Nome: {i.nome} {i.sobrenome}, {i.genero}>")
         
     print("-" * 36 + "\n")
 

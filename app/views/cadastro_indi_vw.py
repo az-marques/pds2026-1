@@ -47,8 +47,6 @@ class CadastroIndiVw(QWidget):
             # add item (txt visivel, objeto pyhton)
             self.combo_box_genero.addItem(genero.value, genero)
             
-        self.chk_vivo=QCheckBox("A pessoa está viva")
-        self.chk_vivo.setChecked(True)
         
         self.birth_dt_input = QDateEdit()
         self.birth_dt_input.setCalendarPopup(True)
@@ -68,7 +66,6 @@ class CadastroIndiVw(QWidget):
 
         form.addRow("Local:", self.birth_place_input)
         form.addRow("Notas:", self.birth_notes_input)
-        form.addRow("", self.chk_vivo)
         
         
         save_btn=QPushButton("Adicionar pessoa")
@@ -86,7 +83,6 @@ class CadastroIndiVw(QWidget):
             "nome": self.input_fname.text(),
             "sobrenome": self.input_lname.text(),
             "genero": gen_select,
-            "vivo": self.chk_vivo.isChecked(),
             "nascimento": {
                 "data": self.birth_dt_input.date().toPython(),
                 "local": self.birth_place_input.text(),
