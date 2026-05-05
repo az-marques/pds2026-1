@@ -26,7 +26,10 @@ def consulta_pessoa():
     print("\n--- Lista de Famílias Cadastradas ---")
     familias=session.query(Familia).all()
     for f in familias:
+        eventos = f.eventos
         print(f)
+        for e in eventos:
+            print(f"  {e.tag.name} [{e.id}] Data: {e.data}, Local: {e.local}, Notas: {e.notas}")
         
     print("-" * 36 + "\n")
 

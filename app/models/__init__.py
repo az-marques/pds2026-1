@@ -3,5 +3,6 @@ from .enums import GenderEnum, EvenTagEnum
 from .individuo import Individuo
 from .familia import Familia
 from .evento import Evento
+from .evento_familiar import EventoFamiliar
 
 # Agora pode fazer: from database import Individuo, Local...

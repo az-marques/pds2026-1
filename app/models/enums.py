@@ -10,5 +10,7 @@ class EvenTagEnum(Enum):
     BIRT = "Nascimento"
     CHR = "Batismo"
     DEAT = "Falecimento"
-    MARR = "Casamento"
     IMMI = "Imigracao"
+
+class FEvenTagEnum(Enum):
+    MARR = "Casamento"
