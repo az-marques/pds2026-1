@@ -116,4 +116,30 @@ class IndividuoController:
                 session.rollback()
                 raise Exception(f"Erro na base de dados: {str(err_db)}")
     
+    def cria_evento(self, indi_id: int, dados_evento: dict):
+        # 1-pydantic
+        # recebe um dicionario
+        try:
+            # valida com o esquema do pydantic
+            dados_validados=EventSchema(**dados_evento) # ** serve para desencapsular dicionario
+        except ValidationError as err:
+            # erro capturado pelo pydantic
+            raise ValueError(f"Erro de Validação:\n{err.errors()[0]['msg']}")
 
+        # 2-transacao com a base de dados
+        with self.Session() as session:
+            try:
+                novo_evento = Evento(
+                    indi_id=indi_id, #adicionar verificão de que o indivíduo existe de algum jeito?
+                    tag=dados_validados.tag,
+                    data=dados_validados.data,
+                    local=dados_validados.local,
+                    notas=dados_validados.notas
+                )
+
+                session.add(novo_evento)
+                session.flush()
+                session.commit()
+            except SQLAlchemyError as err_db:
+                session.rollback()
+                raise Exception(f"Erro na base de dados: {str(err_db)}")

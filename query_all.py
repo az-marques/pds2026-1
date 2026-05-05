@@ -19,13 +19,15 @@ def consulta_pessoa():
         # Você pode formatar a saída como preferir
         # print(i)
         print(f"<[{i.id}] Nome: {i.nome} {i.sobrenome}, {i.genero}")
-        #print(f"ID: {i.id} | Nome: {i.nome} | Gen: {i.genero0} | Vivo? {i.vivo} | ")
+        for e in i.eventos:
+            print(f"<<{e.tag.name} [{e.id}] Data: {e.data}, Local: {e.local}, Notas: {e.notas}")
         
     print("-" * 36 + "\n")
 
 if __name__ == "__main__":
     init_db()
     try:
+
         consulta_pessoa()
     except Exception as e:
         print(f"Erro ao conectar ou consultar o banco de dados:\n{e}")
