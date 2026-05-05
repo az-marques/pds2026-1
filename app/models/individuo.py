@@ -19,8 +19,6 @@ class Individuo(Base):
         SQLEnum(GenderEnum), 
         nullable=False,
         default=GenderEnum.OTHER) # opcional = native_enum=False
-    # boolean vivo True or False
-    vivo: Mapped[bool] = mapped_column(default=True)
     
     parentesco_id: Mapped[Optional[int]] = mapped_column(ForeignKey("familias.id"))
     parentesco: Mapped[Optional["Familia"]] = relationship(back_populates="crianças")

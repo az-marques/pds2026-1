@@ -33,7 +33,6 @@ class IndividuoSchema(BaseModel):
     sobrenome: str=Field(..., min_length=2, max_length=50, description="Sobrenome da pessoa")
     # validacao suja, nao sei como validar isso, mas tbm nao acho necessario
     genero: GenderEnum
-    vivo: bool=True
     
     @field_validator("nome", "sobrenome")
     @classmethod
@@ -74,7 +73,6 @@ class IndividuoController:
                     nome=dados_validados.nome,
                     sobrenome=dados_validados.sobrenome,
                     genero=dados_validados.genero,
-                    vivo=dados_validados.vivo
                 )
                 session.add(novo_indi)
                 session.flush() # garante que indi esta disponivel
