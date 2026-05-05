@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field, field_validator, ValidationError
 from app.models.individuo import Individuo
 from app.models.evento import Evento
 from app.models.evento_familiar import EventoFamiliar
+from app.models.familia import Familia
 from app.models.enums import GenderEnum, EvenTagEnum, FEvenTagEnum
 
 from datetime import date
@@ -123,7 +124,42 @@ class IndividuoController:
             except SQLAlchemyError as err_db:
                 session.rollback()
                 raise Exception(f"Erro na base de dados: {str(err_db)}")
+    
+    def cria_familia(self, pai_a_id: int, pai_b_id: int, dados_casamento: Optional[dict]):
+        if dados_casamento:
+            try:
+                dados_casamento["tag"] = FEvenTagEnum.MARR
+                # valida com o esquema do pydantic
+                dados_validados=FamilyEventSchema(**dados_casamento) # ** serve para desencapsular dicionario
+            except ValidationError as err:
+                # erro capturado pelo pydantic
+                raise ValueError(f"Erro de Validação:\n{err.errors()[0]['msg']}")
 
+        #transação com a DB
+        with self.Session() as session:
+            try:
+                nova_familia = Familia(
+                    pai_a_id=pai_a_id,
+                    pai_b_id=pai_b_id
+                )
+
+                if (dados_casamento):
+                    casamento = EventoFamiliar(
+                        tag=dados_validados.tag,
+                        data=dados_validados.data,
+                        local=dados_validados.local,
+                        notas=dados_validados.notas
+                    )
+                    nova_familia.eventos.append(casamento)
+                
+
+
+                session.add(nova_familia)
+                session.flush()
+                session.commit()
+            except SQLAlchemyError as err_db:
+                session.rollback()
+                raise Exception(f"Erro na base de dados: {str(err_db)}")
 
     def cria_evento_individual(self, indi_id: int, dados_evento: dict):
         # 1-pydantic
