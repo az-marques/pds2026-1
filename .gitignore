@@ -1,0 +1,24 @@
+# Ambientes Virtuais
+venv/
+env/
+.venv/
+
+# Senhas e Configurações sensíveis
+.env
+.env.local
+
+# Cache compilado do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Configurações do Editor (VS Code)
+.vscode/
+
+# Bancos de dados locais (ex: se usar SQLite depois)
+*.db
+*.sqlite3
+
+
+.idea/
+.qtcreator/

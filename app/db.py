@@ -3,16 +3,13 @@ from datetime import date
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import or_
-
-from tabelas import Base, Individuo, Familia, Casamento, Evento
-
-
+from app.trash.tabelas import Base, Individuo, Familia, Casamento
 class DBManager():
     engine = None
     def __init__(self, db_url):
         self.engine = create_engine(db_url, echo=False)
         Base.metadata.create_all(self.engine)
-
+        
     #cria um objeto Individuo, o adiciona a database, e o retorna
     def add_individuo(self, indi__nome: str, indi_sobrenome: str, indi_genero: Optional[str] = None):
         match indi_genero.lower():
@@ -46,7 +43,6 @@ class DBManager():
                 stmt = stmt.where(Individuo.nome.in_(indi_nomes))
             if (indi_sobrenomes != None):
                 stmt = stmt.where(Individuo.sobrenome.in_(indi_sobrenomes))
-
 
             individuos = session.scalars(stmt).all()
         return individuos
@@ -94,7 +90,6 @@ class DBManager():
                                       conjuge_a == conjuge))
             casamentos = session.scalars(stmt).all()
         return casamentos
-
     
     def get_familia(self, pais: Casamento):
         with Session(self.engine) as session:
@@ -144,6 +139,3 @@ class DBManager():
         self.add_criança(maggie, cas)
 
         print("Exemplo carregado")
-
-
-    
