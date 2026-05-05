@@ -21,7 +21,7 @@ class Individuo(Base):
         default=GenderEnum.OTHER) # opcional = native_enum=False
     
     parentesco_id: Mapped[Optional[int]] = mapped_column(ForeignKey("familias.id"))
-    parentesco: Mapped[Optional["Familia"]] = relationship(back_populates="crianças")
+    parentesco: Mapped[Optional["Familia"]] = relationship(backref="crianças", foreign_keys=parentesco_id)
 
     eventos: Mapped[Optional[list["Evento"]]] = relationship(back_populates="indi")
     
@@ -29,5 +29,4 @@ class Individuo(Base):
          return f"{self.nome} {self.sobrenome}"
     
     def __repr__(self) -> str:
-        status = "Vivo" if self.vivo else "Falecido"
-        return f"([{self.id}] {self.nome} {self.sobrenome} - {self.genero} - {status})"
+        return f"([{self.id}] {self.nome} {self.sobrenome} - {self.genero})"
