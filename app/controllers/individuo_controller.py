@@ -9,8 +9,9 @@ from pydantic import BaseModel, Field, field_validator, ValidationError
 # tabelas.py -> models
 
 from app.models.individuo import Individuo
-from app.models.evento import EvenTagEnum, Evento
-from app.models.enums import GenderEnum
+from app.models.evento import Evento
+from app.models.evento_familiar import EventoFamiliar
+from app.models.enums import GenderEnum, EvenTagEnum, FEvenTagEnum
 
 from datetime import date
 import re
@@ -30,6 +31,13 @@ class EventSchema(BaseModel):
     #         raise ValueError("Data de morte não pode ser antes do nascimento")
 
     #     return value
+
+class FamilyEventSchema(BaseModel):
+    tag: FEvenTagEnum
+    data: date
+    local: str=Field(..., min_length=2, max_length=100, description="Local do evento")
+    notas: Optional[str] = None # nao precisa de uma mascara?
+
 class IndividuoSchema(BaseModel):
     nome: str=Field(..., min_length=2, max_length=50, description="Primeiro nome da pessoa")
     sobrenome: str=Field(..., min_length=2, max_length=50, description="Sobrenome da pessoa")
@@ -115,8 +123,9 @@ class IndividuoController:
             except SQLAlchemyError as err_db:
                 session.rollback()
                 raise Exception(f"Erro na base de dados: {str(err_db)}")
-    
-    def cria_evento(self, indi_id: int, dados_evento: dict):
+
+
+    def cria_evento_individual(self, indi_id: int, dados_evento: dict):
         # 1-pydantic
         # recebe um dicionario
         try:
@@ -131,6 +140,34 @@ class IndividuoController:
             try:
                 novo_evento = Evento(
                     indi_id=indi_id, #adicionar verificão de que o indivíduo existe de algum jeito?
+                    tag=dados_validados.tag,
+                    data=dados_validados.data,
+                    local=dados_validados.local,
+                    notas=dados_validados.notas
+                )
+
+                session.add(novo_evento)
+                session.flush()
+                session.commit()
+            except SQLAlchemyError as err_db:
+                session.rollback()
+                raise Exception(f"Erro na base de dados: {str(err_db)}")
+            
+    def cria_evento_familiar(self, fam_id: int, dados_evento: dict):
+        # 1-pydantic
+        # recebe um dicionario
+        try:
+            # valida com o esquema do pydantic
+            dados_validados=FamilyEventSchema(**dados_evento) # ** serve para desencapsular dicionario
+        except ValidationError as err:
+            # erro capturado pelo pydantic
+            raise ValueError(f"Erro de Validação:\n{err.errors()[0]['msg']}")
+
+        # 2-transacao com a base de dados
+        with self.Session() as session:
+            try:
+                novo_evento = EventoFamiliar(
+                    fam_id=fam_id, #adicionar verificão de que a família existe de algum jeito?
                     tag=dados_validados.tag,
                     data=dados_validados.data,
                     local=dados_validados.local,
