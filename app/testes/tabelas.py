@@ -74,8 +74,9 @@ class Local(Base):
     # Detalhes geográficos normalizados
     cidade: Mapped[Optional[str]] = mapped_column(String)
     estado: Mapped[Optional[str]] = mapped_column(String) # Opcional (ex: países sem estados)
-    pais: Mapped[str] = mapped_column(String)
     regiao: Mapped[Optional[str]] = mapped_column(String) # Ex: Europa, América do Sul, etc.
+    pais: Mapped[str] = mapped_column(String)
+
     
     #resolver regiao
     def __repr__(self) -> str:
@@ -133,7 +134,7 @@ class Evento(Base):
         nullable=False
     )
     
-    # data: dia INT, mes IND -> opcionais
+    # data: dia INT, mes INT -> opcionais
     dia: Mapped[Optional[int]]=mapped_column()
     mes: Mapped[Optional[int]]=mapped_column()
     

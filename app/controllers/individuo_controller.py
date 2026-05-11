@@ -7,9 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from pydantic import BaseModel, Field, field_validator, ValidationError
 # tabelas.py -> models
 
-from app.models.individuo import Individuo
+# from app.models.individuo import Individuo
 from app.models.evento import EvenTagEnum, Evento
-from app.models.enums import GenderEnum
+from app.models.tables import Individuo, GenderEnum
 
 from datetime import date
 import re
@@ -34,15 +34,14 @@ class IndividuoSchema(BaseModel):
     # validacao suja, nao sei como validar isso, mas tbm nao acho necessario
     genero: GenderEnum
     
-    @field_validator("nome", "sobrenome")
+    @field_validator('nome', 'sobrenome')
     @classmethod
-    def validar_nome(cls, valor: str) -> str:
-        
-        # if not valor:
-        #     raise ValueError("O campo nao pode estar vazio")
-        if not re.match(r"^[A-Za-zÀ-ÿ\s]+$", valor):
+    def validar_nome(cls, val: str) -> str:
+        if not val:
+            raise ValueError("O campo nao pode estar vazio")
+        if not re.match(r"^[A-Za-zÀ-ÿ\s]+$", val):
             raise ValueError("Nome deve conter apenas letras")
-        return valor.strip()
+        return val.strip().title() # remove espacos em branco e captaliza
 
 class IndividuoController:
     def __init__(self, ses_mkr: sessionmaker):

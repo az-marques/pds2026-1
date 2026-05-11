@@ -1,6 +1,3 @@
-# APAGUE ESTAS LINHAS:
-# from .evento import Evento
-# from .familia import Familia
 from sqlalchemy import String, ForeignKey, Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional
@@ -25,8 +22,8 @@ class Individuo(Base):
 
     eventos: Mapped[Optional[list["Evento"]]] = relationship(back_populates="indi")
     
-    def nome_sobrenome(self):
+    def nome_sobrenome(self) -> str:
          return f"{self.nome} {self.sobrenome}"
     
     def __repr__(self) -> str:
-        return f"([{self.id}] {self.nome} {self.sobrenome} - {self.genero})"
+        return f"([{self.id}] {self.nome_sobrenome()}- {self.genero})"

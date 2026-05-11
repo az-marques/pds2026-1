@@ -11,3 +11,42 @@ genealogy-app/
 │   ├── database/
 │
 ├── requirements.txt
+
+
+Pessoa{
+    id*,
+    nome,
+    sobrenome,
+    genero,
+    pai,
+    mae,
+}
+
+Evento{
+    id*,
+    tipo,
+    dia,
+    mes,
+    ano,
+    exato,
+    pessoa,
+    local,
+}
+
+Local{
+    id,
+    cidade,
+    estado,
+    regiao,
+    pais
+}
+
+Uniao{
+    id,
+    pai
+    mae
+    diaCasamento,
+    mesCasamento,
+    anoCasamento,
+    local_casamento_fk
+}
