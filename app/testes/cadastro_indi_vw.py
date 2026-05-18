@@ -15,6 +15,8 @@ from PySide6.QtWidgets import (
     QMessageBox
 )
 
+from app.models.evento import EvenTagEnum
+
 from app.models.enums import GenderEnum
 class CadastroIndiVw(QWidget):
     def __init__(self, controller):
@@ -84,6 +86,7 @@ class CadastroIndiVw(QWidget):
             "sobrenome": self.input_lname.text(),
             "genero": gen_select,
             "nascimento": {
+                "tag": EvenTagEnum.BIRT,
                 "data": self.birth_dt_input.date().toPython(),
                 "local": self.birth_place_input.text(),
                 "notas": self.birth_notes_input.text()

@@ -18,7 +18,7 @@ class Individuo(Base):
         default=GenderEnum.OTHER) # opcional = native_enum=False
     
     parentesco_id: Mapped[Optional[int]] = mapped_column(ForeignKey("familias.id"))
-    parentesco: Mapped[Optional["Familia"]] = relationship(back_populates="crianças")
+    parentesco: Mapped[Optional["Familia"]] = relationship(backref="crianças", foreign_keys=parentesco_id)
 
     eventos: Mapped[Optional[list["Evento"]]] = relationship(back_populates="indi")
     

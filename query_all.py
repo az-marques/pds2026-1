@@ -1,6 +1,7 @@
 # script para consulta de todos
 from app.database.db import init_db, Session
 from app.models.individuo import Individuo
+from app.models.familia import Familia
 
 session=Session()
 # 4. Função principal para buscar e exibir
@@ -17,13 +18,25 @@ def consulta_pessoa():
     # Itera sobre os resultados e imprime no terminal
     for i in individuos:
         # Você pode formatar a saída como preferir
-        print(f"<[{i.id}] Nome: {i.nome} {i.sobrenome}, {i.genero}>")
+        eventos = i.eventos
+        print(f"<[{i.id}] Nome: {i.nome} {i.sobrenome}, {i.genero}")
+        for e in eventos:
+            print(f"<<{e.tag.name} [{e.id}] Data: {e.data}, Local: {e.local}, Notas: {e.notas}")
+    
+    print("\n--- Lista de Famílias Cadastradas ---")
+    familias=session.query(Familia).all()
+    for f in familias:
+        eventos = f.eventos
+        print(f)
+        for e in eventos:
+            print(f"  {e.tag.name} [{e.id}] Data: {e.data}, Local: {e.local}, Notas: {e.notas}")
         
     print("-" * 36 + "\n")
 
 if __name__ == "__main__":
     init_db()
     try:
+
         consulta_pessoa()
     except Exception as e:
         print(f"Erro ao conectar ou consultar o banco de dados:\n{e}")

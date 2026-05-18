@@ -22,7 +22,7 @@ class Casamento(Base):
     conjuge_b: Mapped["Individuo"] = relationship(foreign_keys=conjuge_b_id,
                                                    backref="casamentos_b")
 
-    familia: Mapped["Familia"] = relationship(back_populates="pais")
+    #familia: Mapped["Familia"] = relationship(back_populates="pais")
 
     def __repr__(self):
         return f"Casamento[{self.id}] ({self.conjuge_a_id}+{self.conjuge_b_id})"
